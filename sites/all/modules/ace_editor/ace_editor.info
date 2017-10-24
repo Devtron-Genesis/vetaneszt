@@ -1,0 +1,13 @@
+name = Ace Editor
+description = Lets you edit code with the Ace Editor.
+package = Administration
+core = 7.x
+configure = admin/config/content/ace-editor
+dependencies[] = libraries
+
+; Information added by Drupal.org packaging script on 2017-07-18
+version = "7.x-1.9"
+core = "7.x"
+project = "ace_editor"
+datestamp = "1500407350"
+

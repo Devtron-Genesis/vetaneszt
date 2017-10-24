@@ -1,0 +1,127 @@
+<?php
+/**
+ * @file
+ * Install, update and uninstall functions for the module.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function ace_editor_install() {
+
+  // Create a default text format to use with the editor.
+  if (!filter_format_exists('ace_editor')) {
+    $html_editor_format = new stdClass();
+    $html_editor_format->format = 'ace_editor';
+    $html_editor_format->name = 'Ace Editor';
+    $html_editor_format->status = 1;
+    $html_editor_format->weight = 100;
+    filter_format_save($html_editor_format);
+  }
+  else {
+    // Enable ace_editor.
+    db_update('filter_format')
+      ->fields(array('status' => 1))
+      ->condition('format', 'ace_editor')
+      ->execute();
+  }
+
+  // Set the newly created text format to use the editor.
+  variable_set('ace_editor_filter_formats', array('ace_editor'));
+
+  // Set the defaults to other variables.
+  variable_set('ace_editor_autocomplete', TRUE);
+  variable_set('ace_editor_autowrap', TRUE);
+  variable_set('ace_editor_codefolding', 'markbegin');
+  variable_set('ace_editor_default_syntax', 'html');
+  variable_set('ace_editor_fontsize', '12pt');
+  variable_set('ace_editor_invisibles', FALSE);
+  variable_set('ace_editor_linehighlighting', TRUE);
+  variable_set('ace_editor_line_numbers', TRUE);
+  variable_set('ace_editor_printmargin', FALSE);
+  variable_set('ace_editor_tabsize', 2);
+  variable_set('ace_editor_theme', 'cobalt');
+
+  // Get modes and themes.
+  ace_editor_get_assets();
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function ace_editor_uninstall() {
+
+  // Remove the associated variables.
+  variable_del('ace_editor_assets');
+  variable_del('ace_editor_autocomplete');
+  variable_del('ace_editor_autowrap');
+  variable_del('ace_editor_codefolding');
+  variable_del('ace_editor_default_syntax');
+  variable_del('ace_editor_filter_formats');
+  variable_del('ace_editor_fontsize');
+  variable_del('ace_editor_invisibles');
+  variable_del('ace_editor_linehighlighting');
+  variable_del('ace_editor_line_numbers');
+  variable_del('ace_editor_printmargin');
+  variable_del('ace_editor_tabsize');
+  variable_del('ace_editor_theme');
+}
+
+/**
+ * Implements hook_requirements().
+ */
+function ace_editor_requirements($phase) {
+
+  $requirements = array();
+  $t = get_t();
+  // Verify that the library is present.
+  if ($phase == 'runtime') {
+    // Libraries module is a dependency.
+    if (!drupal_load('module', 'libraries')) {
+      $requirements['ace_editor'] = array(
+        'title' => t('Libraries module missing'),
+        'severity' => REQUIREMENT_ERROR,
+        'value' => t('Libraries module required for Ace Editor.'),
+        'description' => $t('Ace Editor module requires the <a href="@url">Libraries module</a> to be installed.', array('@url' => 'http://drupal.org/project/libraries')),
+       );
+      return $requirements;
+    }
+
+    if (!is_dir(libraries_get_path('ace'))) {
+      $requirements['ace_editor'] = array(
+        'title' => $t('Ace Editor'),
+        'value' => $t('The required Ace library is missing. @eol See README.txt for the installation instructions.', array('eol' => PHP_EOL)),
+        'severity' => REQUIREMENT_ERROR,
+      );
+    }
+    else {
+      $requirements['ace_editor'] = array(
+        'title' => $t('Ace Editor'),
+        'severity' => REQUIREMENT_OK,
+        'value' => $t('Ace library installed (release ' .
+          trim(fgets(fopen(DRUPAL_ROOT . '/' . libraries_get_path('ace') . '/ChangeLog.txt', 'r'))) .
+          ').'),
+      );
+    }
+  }
+
+  if ($phase == 'install') {
+    if (!module_exists('libraries')) {
+      $requirements['ace_editor'] = array(
+        'title' => $t('Libraries module is missing'),
+        'severity' => REQUIREMENT_ERROR,
+        'value' => $t('Libraries module is required for Ace Editor.'),
+        'description' => $t('Ace Editor module requires the <a href="@url">Libraries module</a> to be installed.', array('@url' => 'http://drupal.org/project/libraries')),
+      );
+    }
+    elseif (function_exists('libraries_get_libraries') && !is_dir(libraries_get_path('ace'))) {
+      drupal_set_message(
+        $t('The required Ace library is missing. The library can be found at <a href="@url">@url</a>. You can install it manually following the README.txt instructions or using the "drush dl-ace" command (it will be downloaded to the libraries/ace directory).',
+          array('@url' => 'https://github.com/ajaxorg/ace')),
+        'warning'
+        );
+    }
+  }
+
+  return $requirements;
+}

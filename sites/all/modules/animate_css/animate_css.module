@@ -1,0 +1,228 @@
+<?php
+
+/**
+ * @file
+ * Drupal integration with Animate.css, bunch of cool, fun, and cross-browser animations for you to use in your projects.
+ */
+define('ANIMATE_CSS_DEVEL', variable_get('animate_css_devel', FALSE));
+
+/**
+ * Implements hook_help().
+ */
+function animate_css_help($path, $arg) {
+  switch ($path) {
+  case 'admin/help#animate':
+    return '<p>' . t('<a href="@animate">Animate</a> is a bunch of cool, fun, and cross-browser animations for you to use in your projects.', array(
+      '@animate' => 'http://daneden.me/animate/',
+    )) . '</p>';
+  }
+}
+
+/**
+ * Implements hook_init().
+ */
+function animate_css_init() {
+  // Load up the Animate CSS file.
+  drupal_load('module', 'libraries');
+
+  if (ANIMATE_CSS_DEVEL == TRUE) {
+    libraries_load('animate');
+  }
+  else {
+    libraries_load('animate', 'minified');
+  }
+}
+
+/**
+ * Implements hook_libraries_info().
+ */
+function animate_css_libraries_info() {
+  $libraries['animate'] = array(
+    'name' => 'Animate CSS',
+    'vendor url' => 'http://daneden.me/animate/',
+    'download url' => 'https://github.com/daneden/animate.css/archive/master.zip',
+    'version arguments' => array(
+      'file' => 'package.json',
+      'pattern' => '/((?:\d+\.?){2,3})/',
+    ),
+    'files' => array(
+      'css' => array(
+        'animate.css',
+      ),
+    ),
+    'variants' => array(
+      'minified' => array(
+        'files' => array(
+          'css' => array(
+            'animate.min.css',
+          ),
+        ),
+        'variant arguments' => array(
+          'variant' => 'minified',
+        ),
+      ),
+    ),
+  );
+
+  return $libraries;
+}
+
+/**
+ * Provide options for options fields.
+ */
+function animate_css_animations() {
+  $animations = array(
+    'Attention Seekers' => array(
+      'bounce' => 'Bounce',
+      'flash' => 'Flash',
+      'pulse' => 'Pulse',
+      'rubberBand' => 'Rubber Band',
+      'shake' => 'Shake',
+      'swing' => 'Swing',
+      'tada' => 'Ta-da',
+      'wobble' => 'Wobble',
+      'jello' => 'Jello'
+    ),
+    'Bouncing Entrances' => array(
+      'bounceIn' => 'Bounce In',
+      'bounceInDown' => 'Bounce In Down',
+      'bounceInLeft' => 'Bounce In Left',
+      'bounceInRight' => 'Bounce In Right',
+      'bounceInUp' => 'Bounce In Up'
+    ),
+    'Bouncing Exit' => array(
+      'bounceOut' => 'Bounce Out',
+      'bounceOutDown' => 'Bounce Out Down',
+      'bounceOutLeft' => 'Bounce Out Left',
+      'bounceOutRight' => 'Bounce Out Right',
+      'bounceOutUp' => 'Bounce Out Up'
+    ),
+    'Fading Entrances' => array(
+      'fadeIn' => 'Fade In',
+      'fadeInDown' => 'Fade In Down',
+      'fadeInLeft' => 'Fade In Left',
+      'fadeInRight' => 'Fade In Right',
+      'fadeInUp' => 'Fade In Up',
+      'fadeInDownBig' => 'Fade In Down Big',
+      'fadeInLeftBig' => 'Fade In Left Big',
+      'fadeInRightBig' => 'Fade In Right Big',
+      'fadeInUpBig' => 'Fade In Up Big'
+    ),
+    'Fading Exits' => array(
+      'fadeOut' => 'Fade Out',
+      'fadeOutDown' => 'Fade Out Down',
+      'fadeOutLeft' => 'Fade Out Left',
+      'fadeOutRight' => 'Fade Out Right',
+      'fadeOutUp' => 'Fade Out Up',
+      'fadeOutDownBig' => 'Fade Out Down Big',
+      'fadeOutLeftBig' => 'Fade Out Left Big',
+      'fadeOutRightBig' => 'Fade Out Right Big',
+      'fadeOutUpBig' => 'Fade Out Up Big'
+    ),
+    'Flippers' => array(
+      'flip' => 'Flip',
+      'flipInX' => 'Flip In X',
+      'flipInY' => 'Flip In Y',
+      'flipOutX' => 'Flip Out X',
+      'flipOutY' => 'Flip Out Y'
+    ),
+    'Lightspeed' => array(
+      'lightSpeedIn' => 'Lightspeed In',
+      'lightSpeedOut' => 'Lightspeed Out'
+    ),
+    'Rotating Entrances' => array(
+      'rotateIn' => 'Rotate In',
+      'rotateInDownLeft' => 'Rotate In Down Left',
+      'rotateInDownRight' => 'Rotate In Down Right',
+      'rotateInUpLeft' => 'Rotate In Up Left',
+      'rotateInUpRight' => 'Rotate In Up Right'
+    ),
+    'Rotating Exits' => array(
+      'rotateOut' => 'Rotate Out',
+      'rotateOutDownLeft' => 'Rotate Out Down Left',
+      'rotateOutDownRight' => 'Rotate Out Down Right',
+      'rotateOutUpLeft' => 'Rotate Out Up Left',
+      'rotateOutUpRight' => 'Rotate Out Up Right'
+    ),
+    'Sliding Entrances' => array(
+      'slideInUp' => 'Slide In Up',
+      'slideInDown' => 'Slide In Down',
+      'slideInLeft' => 'Slide In Left',
+      'slideInRight' => 'Slide In Right'
+    ),
+    'Sliding Exits' => array(
+      'slideOutUp' => 'Slide Out Up',
+      'slideOutDown' => 'Slide Out Down',
+      'slideOutLeft' => 'Slide Out Left',
+      'slideOutRight' => 'Slide Out Right'
+    ),
+    'Zoom Entrances' => array(
+      'zoomInUp' => 'Zoom In Up',
+      'zoomInDown' => 'Zoom In Down',
+      'zoomInLeft' => 'Zoom In Left',
+      'zoomInRight' => 'Zoom In Right'
+    ),
+    'Zoom Exits' => array(
+      'zoomOutUp' => 'Zoom Out Up',
+      'zoomOutDown' => 'Zoom Out Down',
+      'zoomOutLeft' => 'Zoom Out Left',
+      'zoomOutRight' => 'Zoom Out Right'
+    ),
+    'Specials' => array(
+      'hinge' => 'Hinge',
+      'rollIn' => 'Roll In',
+      'rollOut' => 'Roll Out'
+    )
+  );
+  return $animations;
+}
+
+/**
+ * Form for Animate CSS library settings.
+ */
+function animate_css_settings_form() {
+  $form = array();
+
+  $form['library'] = array(
+    '#type' => 'fieldset',
+    '#title' => 'Library',
+    '#description' => t("Unless you are helping to develop the Animate CSS module, all these are not needed to use Animate CSS."),
+  );
+
+  $form['library']['animate_css_devel'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Use uncompressed CSS'),
+    '#description' => t('Load the uncompressed version of animate.css. This SHOULD NOT be checked on production sites.'),
+    '#default_value' => ANIMATE_CSS_DEVEL,
+  );
+
+  return system_settings_form($form);
+}
+
+/**
+ * Implements hook_menu().
+ */
+function animate_css_menu() {
+  $items['admin/config/media/animate'] = array(
+    'title' => 'Animate CSS',
+    'description' => 'Configure Animate CSS.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('animate_css_settings_form'),
+    'access arguments' => array('administer animate css'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => -10,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function animate_css_permission() {
+  return array(
+    'administer animate css' => array(
+      'title' => t('Administer the Animate CSS library'),
+    ),
+  );
+}

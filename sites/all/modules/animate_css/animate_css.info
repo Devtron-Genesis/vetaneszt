@@ -1,0 +1,16 @@
+name = Animate CSS
+description = animate.css is a bunch of cool, fun, and cross-browser animations for you to use in your projects.
+core = 7.x
+configure = admin/config/media/animate
+
+dependencies[] = libraries (>=7.x-2.0)
+
+files[] = animate_css.install
+files[] = animate_css.module
+
+; Information added by Drupal.org packaging script on 2017-02-24
+version = "7.x-1.42"
+core = "7.x"
+project = "animate_css"
+datestamp = "1487951001"
+

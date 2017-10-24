@@ -1,0 +1,15 @@
+name = Mailjet Campaigns
+description = "Add support for sending MailJet Campaigns."
+core = 7.x
+php = 5.3
+package = MailJet
+
+dependencies[] = mailjet
+dependencies[] = entity
+
+; Information added by Drupal.org packaging script on 2017-06-02
+version = "7.x-2.14"
+core = "7.x"
+project = "mailjet"
+datestamp = "1496404749"
+
