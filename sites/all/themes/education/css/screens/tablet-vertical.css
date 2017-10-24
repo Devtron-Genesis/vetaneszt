@@ -1,4 +1,4 @@
-/* 
+/*
     Document   : tablet
     Description:
         Purpose of the stylesheet follows.
@@ -26,8 +26,7 @@ h2 { font-size: 1.33em; }
 .grid-inner { min-height: inherit !important; min-height:auto !important; }
 
 /* header */
-#logo { top: 12px; }
-#header #logo img { width: 80%; }
+#header #logo img { width: 25%; }
 
 /* nav */
 #headline-wrapper .block { display: none; }
@@ -60,7 +59,7 @@ h2 { font-size: 1.33em; }
 /* sidebar */
 #sidebar-second-wrapper .views-field-field-image {
   float: none;
-  margin: 0 0 10px;  
+  margin: 0 0 10px;
 }
 #sidebar-second-wrapper .embedded-video { text-align: left; }
 #sidebar-second-wrapper .embedded-video iframe { width: auto; }

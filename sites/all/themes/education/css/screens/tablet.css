@@ -1,9 +1,9 @@
-/* 
+/*
     Document   : tablet
     Description:
         Purpose of the stylesheet follows.
 */
-#logo img { width: 80%;}
+#logo img { width: 25%;}
 
 #page { background: none; position: relative; }
 .featured-professors .views-field-field-image img { max-width: 96%; }
@@ -35,7 +35,7 @@
 /* sidebar */
 #sidebar-second-wrapper .views-field-field-image {
   float: none;
-  margin: 0 0 10px;  
+  margin: 0 0 10px;
 }
 
 .embedded-video iframe { max-width: 100%; }

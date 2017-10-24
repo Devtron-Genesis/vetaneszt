@@ -1,4 +1,4 @@
-/* 
+/*
     Document   : mobile
     Description:
         Purpose of the stylesheet follows.
@@ -24,7 +24,7 @@ body { padding: 0; }
 
 /* header */
 #logo { top: 12px; }
-#header #logo img { width: 50%; }
+#header #logo img { width: 50%; float: right;}
 #headline-wrapper .form-text { width: 165px; }
 
 /* nav */
@@ -58,7 +58,7 @@ body { padding: 0; }
 /* sidebar */
 #sidebar-second-wrapper .views-field-field-image {
   float: none;
-  margin: 0 0 10px;  
+  margin: 0 0 10px;
 }
 #sidebar-second-wrapper .form-text { width: 250px !important; }
 #sidebar-second-wrapper .embedded-video { text-align: left; }
