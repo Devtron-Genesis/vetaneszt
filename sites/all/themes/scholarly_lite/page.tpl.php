@@ -10,7 +10,7 @@
         <!-- #header-top-inside -->
         <div id="header-top-inside" class="clearfix">
             <div class="row">
-            
+
             <?php if ($page['header_top_left']) :?>
             <div class="<?php print $header_top_left_grid_class; ?>">
                 <!-- #header-top-left -->
@@ -22,36 +22,36 @@
                 <!-- EOF:#header-top-left -->
             </div>
             <?php endif; ?>
-            
+
             <?php if ($page['header_top_right']) :?>
             <div class="<?php print $header_top_right_grid_class; ?>">
                 <!-- #header-top-right -->
                 <div id="header-top-right" class="clearfix">
-                    <div class="header-top-area">                    
+                    <div class="header-top-area">
                         <?php print render($page['header_top_right']); ?>
                     </div>
                 </div>
                 <!-- EOF:#header-top-right -->
             </div>
             <?php endif; ?>
-            
+
             </div>
         </div>
         <!-- EOF: #header-top-inside -->
 
     </div>
 </div>
-<!-- EOF: #header-top -->    
+<!-- EOF: #header-top -->
 <?php endif; ?>
 
 <!-- #header -->
 <header id="header" class="clearfix">
     <div class="container">
-        
+
         <!-- #header-inside -->
         <div id="header-inside" class="clearfix">
             <div class="row">
-            
+
                 <div class="col-md-4">
                     <!-- #header-inside-left -->
                     <div id="header-inside-left" class="clearfix">
@@ -61,27 +61,27 @@
                     <a href="<?php print $front_page; ?>" title="<?php print t('Home'); ?>" rel="home"> <img src="<?php print $logo; ?>" alt="<?php print t('Home'); ?>" /> </a>
                     </div>
                     <?php endif; ?>
-                    
+
                     <?php if ($site_name):?>
                     <div id="site-name">
                     <a href="<?php print $front_page; ?>" title="<?php print t('Home'); ?>"><?php print $site_name; ?></a>
                     </div>
                     <?php endif; ?>
-                    
+
                     <?php if ($site_slogan):?>
                     <div id="site-slogan">
                     <?php print $site_slogan; ?>
                     </div>
                     <?php endif; ?>
-                    
+
                     <?php if ($page['header']) :?>
                     <?php print render($page['header']); ?>
-                    <?php endif; ?>  
+                    <?php endif; ?>
 
                     </div>
                     <!-- EOF:#header-inside-left -->
                 </div>
-                
+
                 <div class="col-md-8">
                     <!-- #header-inside-right -->
                     <div id="header-inside-right" class="clearfix">
@@ -101,9 +101,9 @@
                         <!-- EOF: #main-navigation -->
 
                     </div>
-                    <!-- EOF:#header-inside-right -->                        
+                    <!-- EOF:#header-inside-right -->
                 </div>
-         
+
             </div>
         </div>
         <!-- EOF: #header-inside -->
@@ -147,7 +147,7 @@
                 <div class="banner-area">
                 <?php print render($page['banner']); ?>
                 </div>
-               
+
                 </div>
             </div>
         </div>
@@ -248,7 +248,7 @@
                         <?php endif; ?>
                         <!-- EOF: #action links -->
 
-                        <?php if (theme_get_setting('frontpage_content_print') || !drupal_is_front_page()):?> 
+                        <?php if (theme_get_setting('frontpage_content_print') || !drupal_is_front_page()):?>
                         <?php print render($page['content']); ?>
                         <?php print $feed_icons; ?>
                         <?php endif; ?>
@@ -267,7 +267,7 @@
                     <!--EOF:#sidebar-->
                 </aside>
                 <?php endif; ?>
-                
+
             </div>
 
         </div>
@@ -307,7 +307,7 @@
         <!-- #footer-top-inside -->
         <div id="footer-top-inside" class="clearfix">
             <div class="row">
-            
+
             <?php if ($page['footer_top_left']) :?>
             <div class="<?php print $footer_top_left_grid_class; ?>">
                 <!-- #footer-top-left -->
@@ -319,26 +319,26 @@
                 <!-- EOF:#footer-top-left -->
             </div>
             <?php endif; ?>
-            
+
             <?php if ($page['footer_top_right']) :?>
             <div class="<?php print $footer_top_right_grid_class; ?>">
                 <!-- #footer-top-right -->
                 <div id="footer-top-right" class="clearfix">
-                    <div class="footer-top-area">                    
+                    <div class="footer-top-area">
                         <?php print render($page['footer_top_right']); ?>
                     </div>
                 </div>
                 <!-- EOF:#footer-top-right -->
             </div>
             <?php endif; ?>
-            
+
             </div>
         </div>
         <!-- EOF: #footer-top-inside -->
 
     </div>
 </div>
-<!-- EOF: #footer-top -->    
+<!-- EOF: #footer-top -->
 <?php endif; ?>
 
 <?php if ($page['footer_first'] || $page['footer_second'] || $page['footer_third'] || $page['footer_fourth']):?>
@@ -353,9 +353,9 @@
                 <?php print render($page['footer_first']); ?>
                 </div>
             </div>
-            <?php endif; ?>      
+            <?php endif; ?>
 
-            <?php if ($page['footer_second']):?>      
+            <?php if ($page['footer_second']):?>
             <div class="<?php print $footer_grid_class; ?>">
                 <div class="footer-area">
                 <?php print render($page['footer_second']); ?>
@@ -381,18 +381,18 @@
         </div>
 
     </div>
-</footer> 
+</footer>
 <!-- EOF #footer -->
 <?php endif; ?>
 
 <?php if ($page['sub_footer_left'] || $page['footer']):?>
 <div id="subfooter" class="clearfix">
 	<div class="container">
-		
+
 		<!-- #subfooter-inside -->
 		<div id="subfooter-inside" class="clearfix">
             <div class="row">
-    			<div class="col-md-4">
+    			<div class="col-md-12">
                     <!-- #subfooter-left -->
                     <?php if ($page['sub_footer_left']):?>
                     <div class="subfooter-area left">
@@ -401,28 +401,28 @@
                     <?php endif; ?>
                     <!-- EOF: #subfooter-left -->
     			</div>
-    			<div class="col-md-8">
+    			<div class="col-md-12">
                     <!-- #subfooter-right -->
                     <?php if ($page['footer']):?>
                     <div class="subfooter-area right">
                     <?php print render($page['footer']); ?>
                     </div>
                     <?php endif; ?>
-                    
+
                     <?php if (theme_get_setting('credits_display')): ?>
-                    <!-- #credits -->  
+                    <!-- #credits -->
                     <div class="subfooter-area">
                     <div class="block">
                     <p>Scholarly Lite is a free theme, contributed to the Drupal Community by <a href="http://www.morethanthemes.com/&mt-referral=scholarlylite" target="_blank">More than Themes</a>.</p></div></div>
                     <!-- EOF: #credits -->
                     <?php endif; ?>
-                    
+
                     <!-- EOF: #subfooter-right -->
     			</div>
             </div>
 		</div>
 		<!-- EOF: #subfooter-inside -->
-	
+
 	</div>
 </div><!-- EOF:#subfooter -->
 <?php endif; ?>
