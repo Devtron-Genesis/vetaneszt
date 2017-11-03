@@ -1,0 +1,2 @@
+[24-Oct-2017 17:36:45 Asia/Karachi] PHP Fatal error:  Allowed memory size of 67108864 bytes exhausted (tried to allocate 72 bytes) in /home/tambrisko/public_html/includes/menu.inc on line 341
+[01-Nov-2017 19:14:04 Asia/Karachi] PHP Fatal error:  Call to undefined method i18n_object_wrapper::strings_update() in /home/tambrisko/public_html/sites/all/modules/i18n/i18n_string/i18n_string.module on line 888
