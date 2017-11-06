@@ -1192,3 +1192,14 @@ ul.contextual-links li a { font-weight: 400; line-height: 1; text-decoration: no
 .maintenance-page #header-top,.maintenance-page #subfooter { min-height: 60px; }
 
 .maintenance-page #footer-top { min-height: 40px; }
+
+.field-name-field-registration-link a {
+  background: #fe0000;
+  border: solid 2px #000000;
+  padding: 5px 20px;
+  font-size: 40px;
+  color: #ffffff;
+  font-weight: bold;
+  border-radius: 10px;
+  text-decoration: none;
+}
