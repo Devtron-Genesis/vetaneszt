@@ -1,7 +1,7 @@
 <article id="node-<?php print $node->nid; ?>" class="<?php print $classes; ?> clearfix node-mt"<?php print $attributes; ?>>
     <?php if ($display_submitted || (module_exists('comment') && ($node->comment == COMMENT_NODE_OPEN || ($node->comment == COMMENT_NODE_CLOSED && $node->comment_count > 0)))): ?>
     <div class="post-submitted-info">
-        
+
         <?php if ($display_submitted): ?>
         <div class="submitted-date">
           <?php $custom_month = format_date($node->created, 'custom', 'M'); ?>
@@ -38,8 +38,8 @@
           <?php print t('By !username', array('!username' => $name)); ?>
           </div>
       <?php endif; ?>
-        
-      <?php print $user_picture; ?> 
+
+      <?php print $user_picture; ?>
 
     </header>
     <?php endif; ?>
