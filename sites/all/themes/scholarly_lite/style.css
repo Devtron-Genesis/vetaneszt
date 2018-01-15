@@ -1219,3 +1219,9 @@ ul.contextual-links li a { font-weight: 400; line-height: 1; text-decoration: no
 .gallery-slides, .gallery-thumbs, .gallery-frame {
 	width: 100% !important;
 }
+#block-menu-menu-cource .show-subnav {
+  display: block!important;
+}
+#block-menu-menu-cource .course-active-color {
+	color:black;
+}
