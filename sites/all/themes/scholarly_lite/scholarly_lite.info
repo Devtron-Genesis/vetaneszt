@@ -5,6 +5,8 @@ core = 7.x
 stylesheets[all][] = bootstrap/css/bootstrap.css
 stylesheets[all][] = style.css
 
+scripts[] = script.js
+
 regions[header_top_left] = Header Top Left
 regions[header_top_right] = Header Top Right
 regions[header] = Header
