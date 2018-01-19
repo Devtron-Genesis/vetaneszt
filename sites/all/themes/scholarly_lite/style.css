@@ -1219,12 +1219,40 @@ ul.contextual-links li a { font-weight: 400; line-height: 1; text-decoration: no
 .gallery-slides, .gallery-thumbs, .gallery-frame {
 	width: 100% !important;
 }
-#block-menu-menu-course .show-subnav {
+/*#block-menu-menu-course .show-subnav {
   display: block !important;
 }
 #block-menu-menu-course .course-active-color {
 	color:black;
 }
-.field-name-field-add-video video {
+.field-name-field-add-video video, video {
 	width: 100%;
+}
+#block-menu-menu-cource ul li a {
+	display: flex;
+}
+#block-menu-menu-cource .color-swatch {
+	width: 15px !important;
+	height: 15px !important;
+	margin: 5px 0px 0px 10px !important;
+	display: inherit;
+}*/
+.view-display-id-block_1 .show-subnav {
+  	display: block !important;
+}
+.view-display-id-block_1 li {
+	list-style: none;
+}
+.view-display-id-block_1 a {
+    font-size: 15px;
+    font-weight: bold;
+    text-decoration: none;
+}
+.view-display-id-block_1 h3 {
+    font-size: 15px;
+    text-transform: none;
+    margin: 0;
+}
+li.lecture-li ul li div {
+	display: inline-block;
 }
