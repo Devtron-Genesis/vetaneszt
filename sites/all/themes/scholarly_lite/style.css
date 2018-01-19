@@ -1225,9 +1225,6 @@ ul.contextual-links li a { font-weight: 400; line-height: 1; text-decoration: no
 #block-menu-menu-course .course-active-color {
 	color:black;
 }
-.field-name-field-add-video video, video {
-	width: 100%;
-}
 #block-menu-menu-cource ul li a {
 	display: flex;
 }
@@ -1237,6 +1234,9 @@ ul.contextual-links li a { font-weight: 400; line-height: 1; text-decoration: no
 	margin: 5px 0px 0px 10px !important;
 	display: inherit;
 }*/
+.field-name-field-add-video video {
+	width: 100%;
+}
 .view-display-id-block_1 .show-subnav {
   	display: block !important;
 }
