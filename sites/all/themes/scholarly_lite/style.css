@@ -1234,8 +1234,9 @@ ul.contextual-links li a { font-weight: 400; line-height: 1; text-decoration: no
 	margin: 5px 0px 0px 10px !important;
 	display: inherit;
 }*/
-.field-name-field-add-video video {
-	width: 100%;
+.field-name-field-add-video video, 
+.views-field-field-add-video video {
+    width: 100%;
 }
 .view-display-id-block_1 .show-subnav {
   	display: block !important;
