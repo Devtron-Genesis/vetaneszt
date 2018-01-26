@@ -1234,8 +1234,12 @@ ul.contextual-links li a { font-weight: 400; line-height: 1; text-decoration: no
 	margin: 5px 0px 0px 10px !important;
 	display: inherit;
 }*/
-.field-name-field-add-video video, 
-.views-field-field-add-video video {
+.view-video-lectures .field-name-field-lecture-video {
+    width: 40%;
+    float: left;
+    padding: 0px 15px 15px 0px;
+}
+video {
     width: 100%;
 }
 .view-display-id-block_1 .show-subnav {
