@@ -1,0 +1,11 @@
+name = Nice Menu onclick
+description = On-Click support for Nice Menus module
+dependencies[] = nice_menus
+core = 7.x
+
+; Information added by Drupal.org packaging script on 2017-06-03
+version = "7.x-1.0"
+core = "7.x"
+project = "nice_menus_onclick"
+datestamp = "1496513645"
+

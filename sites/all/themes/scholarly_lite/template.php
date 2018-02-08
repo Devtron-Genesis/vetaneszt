@@ -554,4 +554,24 @@ function scholarly_lite_form_alter(&$form, &$form_state, $form_id) {
 
 }
 
+// function scholarly_lite_views_exposed_form(&$form){
+//   if($form['#id']=="views-exposed-form-videos-listing-page"){
+//     $links = $form['tid']['#options'];
+//     $newlinks = array();
+    
+//     foreach ($links as $tid => $link) {
+//       $newlinks[] = '<span class="contentBrowserLink" id="' . $tid . '">' . $link . '</span>';
+//     }
+    
+//     $prefix = theme('item_list', $newlinks);
+
+//     $form['links'] = array(
+//       '#type' => 'markup',
+//       '#value' => $prefix,
+//     );
+//   }
+  
+//   return drupal_render($form);
+// }
+
 ?>
