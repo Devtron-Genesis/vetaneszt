@@ -25,7 +25,13 @@ $('li.lecture-li').children('.item-list').find('li').children('.views-field-name
 	$(this).parent('span').parent('div').parent('li').parent('ul').siblings('a').attr('href', lecture_path);
 });
 $('li.lecture-li').children('.item-list').find('li').children('.views-field-name').css('display', 'none');
-// $('video').children('source').remove();
+
+$('ul.shs-hierarchy').parent('.item-list').each(function(){
+    var ptolecture = $(this).html();
+    $(this).parents('.content').siblings('header').before(ptolecture);
+    $(this).parents('.region.region-content').siblings('h1#page-title').before(ptolecture);
+    $(this).hide();
+})
 
 // // Add clases to course menu
 //  $('#block-menu-menu-course').children().children('ul').addClass('course');
