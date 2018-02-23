@@ -55,5 +55,5 @@ https://drupal.org/node/2172541
 
 AUTHOR:
 -------
-Devendra Yadav
+Devendra Singh
 dev.firoza@gmail.com

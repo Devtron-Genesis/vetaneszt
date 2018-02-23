@@ -2,10 +2,12 @@
 
 /**
  * @file
+ * The main file for the Block Export Import module.
+ *
  * The Block Export interface allows the user to select a single or multiple
  * blocks to export/import.
  *
- * @ author Devendra Yadav <dev.firoza@gmail.com>
+ * @gmail.com>vendra Yadav <dev.firoza@gmail.com>
  */
 
 /**
@@ -74,4 +76,3 @@ function _block_export_import_get_block_schema_fields() {
   $block_schema_fields = array_keys($block_schema['fields']);
   return $block_schema_fields;
 }
-

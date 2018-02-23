@@ -120,8 +120,8 @@ function block_export_import_blocks_import_form_submit($form, &$form_state) {
           // the blocks creation process.
           $message = "";
 
-          // It is use to verify related module are enabled or not if not enabled then
-          // it throw an error,for a particular block.
+          // It is use to verify related module are enabled or not if not
+          // enabled then it throw an error,for a particular block.
           $bypass_phpfilter = TRUE;
           if ((int) $visibility === 2) {
             if (!$php_filter) {
@@ -283,10 +283,10 @@ function _block_export_import_block_insert($form_state, $tinfo, $bdata, $bfields
 
   // Create a new system specific blocks and return the current block id.
   $block_id = db_insert('block_custom')->fields(array(
-      'info' => $block_desc,
-      'body' => $body,
-      'format' => $format,
-      )
+    'info' => $block_desc,
+    'body' => $body,
+    'format' => $format,
+  )
     )->execute();
 
   foreach ($tinfo as $theme_data) {
@@ -341,7 +341,7 @@ function _block_export_import_import_node_type($node_types, $block_id) {
         'module' => 'block',
         'delta' => $block_id,
         'type' => $data->type,
-        )
+      )
       )->execute();
     }
   }
@@ -364,7 +364,7 @@ function _block_export_import_import_roles($roles, $block_id) {
         'module' => 'block',
         'delta' => $block_id,
         'rid' => $data->rid,
-        )
+      )
       )->execute();
     }
   }
