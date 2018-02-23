@@ -147,6 +147,11 @@ DirectoryIndex index.php index.html index.htm
   </IfModule>
 </IfModule>
 
+RewriteEngine on 
+RewriteCond %{HTTP_REFERER} !^http://(www\.)?vetaneszt [NC] 
+RewriteCond %{HTTP_REFERER} !^http://(www\.)?vetaneszt.*$ [NC] 
+RewriteRule \.(MP4|mp4)$ - [F]
+
 # Add headers to all responses.
 <IfModule mod_headers.c>
   # Disable content sniffing, since it's an attack vector.

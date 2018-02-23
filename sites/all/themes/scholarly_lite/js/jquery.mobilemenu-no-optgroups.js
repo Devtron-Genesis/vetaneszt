@@ -1,5 +1,13 @@
 (function($){
 
+  // jQuery('.contentBrowserLink').each(function(index) {
+  //   $(this).bind('click', function(){
+  //     var id = $(this).attr('id');
+  //     $('#scholarly_lite_views_exposed_form #edit-tid').val(id);
+  //     $('#scholarly_lite_views_exposed_form').submit();
+  //   });
+  // });
+
   //variable for storing the menu count when no ID is present
   var menuCount = 0;
   

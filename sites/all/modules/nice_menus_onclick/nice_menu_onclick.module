@@ -1,0 +1,56 @@
+<?php
+/**
+ * @file
+ * Module to change the default behavior of Nice menus module from Hover to OnClick.
+ */
+
+/**
+* Implementation of hook_menu()
+*/
+function nice_menu_onclick_menu() {
+  $items['<nolink>'] = array(
+    'page callback' => 'drupal_not_found',
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+/*
+ * Implements hook_library_alter().
+ */
+function nice_menu_onclick_library_alter(&$libraries, $module) {
+  // Change the existing superfish hover menu to superfish click menu for nice menus.
+  if ($module == 'nice_menus' && isset($libraries['superfish'])) {
+    $libraries['superfish']['js'] = array(
+      drupal_get_path('module', 'nice_menu_onclick') . '/js/superfish_onclick.js' => array(),
+    );
+  }
+}
+
+/*
+ * Implements hook_theme_registry_alter().
+ */
+function nice_menu_onclick_theme_registry_alter(&$theme_registry) {
+  // Change function callback on menu_link and override it with custom function.
+  if (isset($theme_registry['menu_link'])) {
+    $theme_registry['menu_link']['function'] = 'theme_nice_menu_onclick';
+  }
+}
+
+/**
+ * Function to detect <nolink> as path and treat the menu item link different from normal menu item.
+ */
+function theme_nice_menu_onclick(array $variables) {
+  $element = $variables['element'];
+  $sub_menu = '';
+  if ($element['#below']) {
+      $sub_menu = drupal_render($element['#below']);
+  }
+  if ($element['#href'] == t('<nolink>')) {
+      $output = '<a href="#" class="nolink" clickable="false">' . $element['#title'] . '</a>';
+  } else {
+      $output = l($element['#title'], $element['#href'], $element['#localized_options']);
+  }
+  return '<li' . drupal_attributes($element['#attributes']) . '>' . $output . $sub_menu . "</li>\n";
+}
