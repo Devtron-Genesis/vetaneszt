@@ -3,7 +3,7 @@
  * Custom behaviors for Simple hierarchical select.
  */
 
-(function ($, Drupal) {
+(function ($) {
 
   /**
    * Creates the widget for Simple hierarchical select.
@@ -13,25 +13,13 @@
     // Default function to attach the behavior.
     attach: function (context, settings) {
       var self = this;
-      var settingsDefault = {
-        display: {
-          animationSpeed: 400,
-        }
-      };
-      $('select.shs-enabled:not([disabled])')
+      $('input.shs-enabled')
+        .not('.shs-processed')
         .once('shs')
         .addClass('element-invisible')
-        .hide()
         .each(function() {
-          $field = $(this);
+          var $field = $(this);
           var fieldName = $(this).attr('name');
-          // Multiform messes up the names of the fields
-          // to the format multiform[something][fieldname][...].
-          if (fieldName.indexOf('multiform') == 0) {
-            var split = fieldName.split('][');
-            split.splice(0, 1);
-            fieldName = split.splice(0, 1) + '[' + split.join('][');
-          }
 
           if (fieldName in settings.shs) {
             var fieldSettings = {};
@@ -40,9 +28,6 @@
             // need to get the last setting for this field.
             $.each(settings.shs[fieldName], function(hash, setting) {
               fieldSettings = setting;
-            });
-            fieldSettings = $.extend({}, fieldSettings, settingsDefault, {
-              fieldName: fieldName
             });
             var level = 0;
             var parent_id = 0;
@@ -57,11 +42,6 @@
                 // Add error-class if there was an error with the original field.
                 $select.addClass('error');
               }
-              // Add label to dropdown.
-              $label = shsLabelCreate($field.attr('id'), fieldSettings, level);
-              if ($label !== false) {
-                $label.appendTo($field.parent());
-              }
               $select.appendTo($field.parent());
               // Retrieve data for this level.
               getTermChildren($select, fieldSettings, parent_id, parent.tid, $field.attr('id'));
@@ -74,21 +54,16 @@
               }
             });
             var addNextLevel = false;
-            if ((level > 1 || parent_id) && ((fieldSettings.settings.create_new_terms && fieldSettings.settings.create_new_levels) || fieldSettings.settings.test_create_new_levels)) {
+            if ((level > 1 || parent_id) && (fieldSettings.settings.create_new_terms && fieldSettings.settings.create_new_levels)) {
               // Add next level in hierarchy if new levels may be created.
               addNextLevel = true;
             }
-            if (fieldSettings.default_value && (fieldSettings.default_value === parent_id) && (fieldSettings.default_value !== '')) {
+            if (fieldSettings.default_value && (fieldSettings.default_value.tid == parent_id)) {
               addNextLevel = true;
             }
             if (addNextLevel) {
-              // Add label to dropdown.
-              $label = shsLabelCreate($field.attr('id'), fieldSettings, level);
-              if ($label !== false) {
-                $label.appendTo($field.parent());
-              }
               // Try to add one additional level.
-              $select = shsElementCreate($field.attr('id'), fieldSettings, ++level);
+              $select = shsElementCreate($field.attr('id'), fieldSettings, level);
               $select.appendTo($field.parent());
               // Retrieve data for this level.
               getTermChildren($select, fieldSettings, parent_id, 0, $field.attr('id'));
@@ -113,13 +88,23 @@
     *   ID of original field which is rewritten as "taxonomy_shs".
     */
   getTermChildren = function($element, settings, parent_value, default_value, base_id) {
+
     // Check if parent_value is number and convert it.
     if (!$.isArray(parent_value) && typeof parent_value != "object") {
       parent_value = [parent_value];
     }
 
+    // Check if default_value is object and convert it.
+    if (!$.isArray(default_value) && typeof default_value == "object") {
+      var arr = new Array;
+      $.each(default_value, function(delta, value){
+        arr.push(value);
+      });
+      default_value = arr;
+    }
+
     $.ajax({
-      url: Drupal.settings.basePath + '?q=' + Drupal.settings.pathPrefix + 'js/shs/json',
+      url: Drupal.settings.basePath + 'js/shs/json',
       type: 'POST',
       dataType: 'json',
       cache: true,
@@ -128,8 +113,7 @@
         arguments: {
           vid: settings.vid,
           parent: parent_value,
-          settings: settings.settings,
-          field: settings.fieldName
+          settings: settings.settings
         }
       },
       success: function(data) {
@@ -141,54 +125,42 @@
             var options = $element.attr('options');
           }
 
-          if (((data.data.length == 0) || ((data.data.length == 1 && !data.data[0].tid))) && !(settings.settings.create_new_terms && (settings.settings.create_new_levels || (parent_value[0] == settings.any_value && default_value == 0)))) {
+          if (data.data.length == 0 && !(settings.settings.create_new_terms && (settings.settings.create_new_levels || (parent_value + default_value == 0)))) {
             // Remove element.
-            $element.prev('label').remove();
             $element.remove();
             return;
           }
 
           // Remove all existing options.
           $('option', $element).remove();
-          // Add empty option (if field is not required or this is not the
-          // first level.
-          if (!settings.settings.required || (settings.settings.required && (default_value === 0 || parent_value !== 0))) {
-            options[options.length] = new Option(settings.any_label, settings.any_value);
+          // Add empty option (if field is not required and not multiple
+          // or this is not the first level and not multiple).
+          if (!settings.settings.required || (settings.settings.required && parent_value != 0 && !settings.multiple)) {
+            options[options.length] = new Option(Drupal.t('- None -'), 0);
+          }
+
+          if (settings.settings.create_new_terms) {
+            // Add option to add new item.
+            options[options.length] = new Option(Drupal.t('<Add new item>', {}, {context: 'shs'}), '_add_new_');
           }
 
           // Add retrieved list of options.
           $.each(data.data, function(key, term) {
-            if (term.vid && settings.settings.create_new_terms) {
-              // Add option to add new item.
-              options[options.length] = new Option(Drupal.t('<Add new item>', {}, {context: 'shs'}), '_add_new_');
-            }
-            else if (term.tid) {
-              option = new Option(term.label, term.tid);
-              options[options.length] = option;
-              if (term.has_children) {
-                option.setAttribute("class", "has-children");
-              }
-            }
+            options[options.length] = new Option(term.label, term.tid);
           });
           // Set default value.
           $element.val(default_value);
-          if (0 === default_value) {
-            $element.val(settings.any_value);
-          }
 
           // Try to convert the element to a "Chosen" element.
           if (!elementConvertToChosen($element, settings)) {
             // Display original dropdown element.
-            $element.fadeIn(settings.display.animationSpeed);
+            $element.fadeIn();
             $element.css('display','inline-block');
-          }
-          else {
-            $element.trigger('chosen:updated');
           }
 
           // If there is no data, the field is required and the user is allowed
           // to add new terms, trigger click on "Add new".
-          if (data.data.length == 0 && settings.settings.required && settings.settings.create_new_terms && (settings.settings.create_new_levels || (parent_value[0] == settings.any_value && default_value == 0))) {
+          if (data.data.length == 0 && settings.settings.required && settings.settings.create_new_terms && (settings.settings.create_new_levels || (parent_value + default_value == 0))) {
             updateElements($element, base_id, settings, 1);
           }
         }
@@ -211,12 +183,10 @@
    *   ID of original field which is rewritten as "taxonomy_shs".
    * @param level
    *   Current level in hierarchy.
-   * @param settings
-   *   Field settings.
    */
-  termAddNew = function($triggering_element, $container, term, base_id, level, settings) {
+  termAddNew = function($triggering_element, $container, term, base_id, level) {
     $.ajax({
-      url: Drupal.settings.basePath + '?q=' + Drupal.settings.pathPrefix + 'js/shs/json',
+      url: Drupal.settings.basePath + 'js/shs/json',
       type: 'POST',
       dataType: 'json',
       cache: true,
@@ -225,8 +195,7 @@
         arguments: {
           vid: term.vid,
           parent: term.parent,
-          name: term.name,
-          field: settings.fieldName
+          name: term.name
         }
       },
       success: function(data) {
@@ -243,30 +212,7 @@
           // Set new default value.
           $triggering_element.val(data.data.tid);
           // Set value of original field.
-          updateFieldValue($triggering_element, base_id, level, settings);
-          // Add new child element if adding new levels is allowed.
-          if (settings.settings.create_new_levels) {
-            $element_new = shsElementCreate(base_id, settings, level + 1);
-            $element_new.appendTo($triggering_element.parent());
-            if ($element_new.prop) {
-              var options_new = $element_new.prop('options');
-            }
-            else {
-              var options_new = $element_new.attr('options');
-            }
-            // Add "none" option.
-            options_new[options_new.length] = new Option(settings.any_label, settings.any_value);
-            if (settings.settings.create_new_terms) {
-              // Add option to add new item.
-              options_new[options_new.length] = new Option(Drupal.t('<Add new item>', {}, {context: 'shs'}), '_add_new_');
-            }
-            // Try to convert the element to a "Chosen" element.
-            if (!elementConvertToChosen($element_new, settings)) {
-              // Display original dropdown element.
-              $element_new.fadeIn(settings.display.animationSpeed);
-              $element_new.css('display','inline-block');
-            }
-          }
+          updateFieldValue($triggering_element, base_id, level);
         }
       },
       error: function(xhr, status, error) {
@@ -275,10 +221,9 @@
       },
       complete: function(xhr, status) {
         // Remove container.
-        $container.prev('label').remove();
         $container.remove();
         // Display triggering element.
-        $triggering_element.fadeIn(settings.display.animationSpeed);
+        $triggering_element.fadeIn();
         $triggering_element.css('display','inline-block');
       }
     });
@@ -302,26 +247,17 @@
       if (Drupal.settings.chosen) {
         // Remove element created by chosen.
         var elem_id = $(this).attr('id');
-        $element_chosen = $('#' + elem_id.replace(/-/g, '_') + '_chosen');
-        if ($element_chosen) {
-          $element_chosen.prev('label').remove();
-          $element_chosen.remove();
-        }
+        $('#' + elem_id.replace(/-/g, '_') + '_chzn').remove();
       }
       // Remove element.
-      $(this).prev('label').remove();
       $(this).remove();
     });
+    //$triggering_element.nextAll('.chzn-container').remove();
     $triggering_element.nextAll('.shs-term-add-new-wrapper').remove();
     // Create next level (if the value is != 0).
     if ($triggering_element.val() == '_add_new_') {
       // Hide element.
       $triggering_element.hide();
-      if (Drupal.settings.chosen) {
-        // Remove element created by chosen.
-        var elem_id = $triggering_element.attr('id');
-        $('#' + elem_id.replace(/-/g, '_') + '_chosen').remove();
-      }
       // Create new container with textfield and buttons ("cancel", "save").
       $container = $('<div>')
         .addClass('shs-term-add-new-wrapper')
@@ -347,16 +283,12 @@
         .bind('click', function(event) {
           event.preventDefault();
           // Remove container.
-          $container.prev('label').remove();
           $container.remove();
           // Reset value of triggering element.
-          $triggering_element.val(settings.settings.any_value);
-
-          if (!elementConvertToChosen($triggering_element, settings)) {
-            // Display triggering element.
-            $triggering_element.fadeIn(settings.display.animationSpeed);
-            $triggering_element.css('display','inline-block');
-          }
+          $triggering_element.val(0);
+          // Display triggering element.
+          $triggering_element.fadeIn();
+          $triggering_element.css('display','inline-block');
         });
       $cancel.appendTo($buttons);
       if (level == 1 && settings.settings.required && $('option', $triggering_element).length == 1) {
@@ -375,31 +307,26 @@
           // Create a term object.
           var term = {
             vid: settings.vid,
-            parent: (level === 1) ? 0 : ($triggering_element.prevAll('.shs-select').val() || 0),
+            parent: $triggering_element.prev('select').val() || 0,
             name: termName
           };
           if (termName.length > 0) {
-            termAddNew($triggering_element, $container, term, base_id, level, settings);
+            termAddNew($triggering_element, $container, term, base_id, level);
           }
           else {
             // Remove container.
-            $container.prev('label').remove();
             $container.remove();
             // Reset value of triggering element.
             $triggering_element.val(0);
             // Display triggering element.
-            $triggering_element.fadeIn(settings.display.animationSpeed);
-            $triggering_element.css('display', 'inline-block');;
+            $triggering_element.fadeIn();
+            $triggering_element.css('display','inline-block');;
           }
         });
       $save.appendTo($buttons);
     }
-    else if ($triggering_element.val() != 0 && $triggering_element.val() != settings.any_value) {
+    else if ($triggering_element.val() != 0) {
       level++;
-      $label = shsLabelCreate(base_id, settings, level);
-      if ($label !== false) {
-        $label.appendTo($triggering_element.parent());
-      }
       $element_new = shsElementCreate(base_id, settings, level);
       $element_new.appendTo($triggering_element.parent());
       // Retrieve list of items for the new element.
@@ -407,7 +334,7 @@
     }
 
     // Set value of original field.
-    updateFieldValue($triggering_element, base_id, level, settings);
+    updateFieldValue($triggering_element, base_id, level, settings.multiple);
   }
 
   /**
@@ -425,52 +352,31 @@
    */
   shsElementCreate = function(base_id, settings, level) {
     // Create element and initially hide it.
-    $element = $('<select>')
-      .attr('id', base_id + '-select-' + level)
-      .addClass('shs-select')
-      // Add core class to apply default styles to the element.
-      .addClass('form-select')
-      .addClass('shs-select-level-' + level)
-      .bind('change', function() {
-        updateElements($(this), base_id, settings, level);
-      })
-      .hide();
     if (settings.multiple) {
-      $element.attr('multiple', 'multiple')
+      $element = $('<select>')
+        .attr('id', base_id + '-select-' + level)
+        .attr('multiple', 'multiple')
+        .addClass('shs-select')
+        // Add core class to apply default styles to the element.
+        .addClass('form-select')
+        .addClass('shs-select-level-' + level)
+        .bind('change', function() {
+          updateElements($(this), base_id, settings, level);
+        })
+        .hide();
     }
-    if (settings.settings.hasOwnProperty('required') && settings.settings.required) {
-      $element.addClass('required');
+    else {
+      $element = $('<select>')
+        .attr('id', base_id + '-select-' + level)
+        .addClass('shs-select')
+        // Add core class to apply default styles to the element.
+        .addClass('form-select')
+        .addClass('shs-select-level-' + level)
+        .bind('change', function() {
+          updateElements($(this), base_id, settings, level);
+        })
+        .hide();
     }
-    // Return the new element.
-    return $element;
-  }
-
-  /**
-   * Create label for dropdown in hierarchy.
-   *
-   * @param base_id
-   *   ID of original field which is rewritten as "taxonomy_shs".
-   * @param settings
-   *   Field settings.
-   * @param level
-   *   Current level in hierarchy.
-   *
-   * @return
-   *   The new <label> element or false if no label should be created.
-   */
-  shsLabelCreate = function(base_id, settings, level) {
-    var labelKey = level - 1;
-    if (!settings.hasOwnProperty('labels')) {
-      return false;
-    }
-    if (!settings.labels.hasOwnProperty(labelKey) || settings.labels[labelKey] === false) {
-      return false;
-    }
-    // Create element.
-    $element = $('<label>')
-      .attr('for', base_id + '-select-' + level)
-      .addClass('element-invisible')
-      .html(settings.labels[labelKey]);
     // Return the new element.
     return $element;
   }
@@ -484,23 +390,21 @@
    *   ID of original field which is rewritten as "taxonomy_shs".
    * @param level
    *   Current level in hierarchy.
-   * @param settings
-   *   Field settings.
    */
-  updateFieldValue = function($triggering_element, base_id, level, settings) {
+  updateFieldValue = function($triggering_element, base_id, level, multiple) {
     // Reset value of original field.
     $field_orig = $('#' + base_id);
-    $field_orig.val(settings.any_value);
+    $field_orig.val(0);
     // Set original field value.
-    if ($triggering_element.val() === settings.any_value || $triggering_element.val() == '_add_new_') {
-      if ($triggering_element.prev('select').length) {
+    if ($triggering_element.val() == 0 || $triggering_element.val() == '_add_new_') {
+      if (level > 1) {
         // Use value from parent level.
         $field_orig.val($triggering_element.prev('select').val());
       }
     }
     else {
       var new_val = $triggering_element.val();
-      if (level > 1 && settings.multiple) {
+      if (level > 1 && multiple) {
         var new_value = '';
         for (i = 0; i < level - 1; i++) {
           var prev_value = $('.shs-select:eq(' + i + ')').val();
@@ -518,33 +422,9 @@
         $field_orig.val(new_val.join(','));
       }
       else {
-        if ($field_orig.children('option[value="' + new_val + '"]').length > 0) {
-          // Value exists.
-          $field_orig.val(new_val);
-        }
-        else {
-          // We need to append the new option.
-          if ($field_orig.prop) {
-            var options = $field_orig.prop('options');
-          }
-          else {
-            var options = $field_orig.attr('options');
-          }
-          options[options.length] = new Option(new_val, new_val);
-          $field_orig.val(new_val);
-        }
+        $field_orig.val(new_val);
       }
     }
-    // Notify listeners about the change in the original select.
-    $field_orig.trigger({
-      type: 'change',
-      shs: {
-        triggeringElement: $triggering_element,
-        level: level,
-        settings: settings,
-        value: $triggering_element.val()
-      }
-    });
   }
 
   /**
@@ -553,48 +433,27 @@
    * @see http://drupal.org/project/chosen
    */
   elementConvertToChosen = function($element, settings) {
-    // Returns false if chosen is not available or its settings are undefined.
-    if ($.fn.chosen === void 0 || !Drupal.settings.hasOwnProperty('chosen') || Drupal.settings.chosen === void 0) {
-      return false;
+    if (Drupal.settings.chosen) {
+      var minWidth = Drupal.settings.chosen.minimum_width;
+      // Define options for chosen.
+      var options = {};
+      options.search_contains = Drupal.settings.chosen.search_contains;
+      options.placeholder_text_multiple = Drupal.settings.chosen.placeholder_text_multiple;
+      options.placeholder_text_single = Drupal.settings.chosen.placeholder_text_single;
+      options.no_results_text = Drupal.settings.chosen.no_results_text;
+
+      // Get element selector from settings (and remove "visible" option since
+      // our select element is hidden by default).
+      var selector = Drupal.settings.chosen.selector.replace(/:visible/, '');
+
+      if ((settings.settings.use_chosen == 'always') || ((settings.settings.use_chosen == 'chosen') && ($element.is(selector) && $element.find('option').size() >= Drupal.settings.chosen.minimum))) {
+        $element.css({
+          width : ($element.width() < minWidth) ? minWidth : $element.width()
+        }).chosen(options);
+        return true;
+      }
     }
-
-    var name = $element.attr('name');
-    settings.chosen = settings.chosen || Drupal.settings.chosen;
-    var minWidth = settings.chosen.minimum_width;
-    var multiple = Drupal.settings.chosen.multiple;
-    var maxSelectedOptions = Drupal.settings.chosen.max_selected_options;
-
-    // Define options.
-    var options = {
-      inherit_select_classes: true
-    };
-
-    var minimum = multiple && multiple[name] ? settings.chosen.minimum_multiple : settings.chosen.minimum_single;
-
-    if (maxSelectedOptions && maxSelectedOptions[name]) {
-      options.max_selected_options = maxSelectedOptions[name];
-    }
-
-    // Merges the user defined settings for chosen.
-    options = $.extend(options, settings.chosen);
-
-    // Get element selector from settings (and remove "visible" option since
-    // our select element is hidden by default).
-    var selector = settings.chosen.selector.replace(/:visible/, '');
-    if ((settings.settings.use_chosen === 'always') || ((settings.settings.use_chosen === 'chosen') && $element.is(selector) && ($element.find('option').size() >= minimum || minimum === 'Always Apply'))) {
-      options = $.extend(options, {
-        width: (($element.width() < minWidth) ? minWidth : $element.width()) + 'px'
-      });
-
-      // Apply chosen to the element.
-      return $element.chosen(options);
-    }
-    else if ((settings.settings.use_chosen === 'never') && (!$element.hasClass('chosen-disable'))) {
-      // Tell chosen to not process this element.
-      $element.addClass('chosen-disable');
-    }
-
     return false;
   }
 
-})(jQuery, Drupal);
+})(jQuery);
