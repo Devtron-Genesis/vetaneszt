@@ -1,0 +1,12 @@
+name = Views breadcrumb
+description =  Setting bread crumbs for all the view's pages.
+dependencies[] = views
+core = "7.x"
+configure = admin/structure/block/manage/views_breadcrumb/views_breadcrumb_block/configure
+
+; Information added by Drupal.org packaging script on 2015-12-22
+version = "7.x-1.0"
+core = "7.x"
+project = "views_breadcrumb"
+datestamp = "1450785540"
+

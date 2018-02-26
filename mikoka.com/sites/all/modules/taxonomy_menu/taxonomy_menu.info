@@ -1,0 +1,17 @@
+core          = "7.x"
+dependencies[] = taxonomy
+dependencies[] = menu
+description   = "Adds links to taxonomy terms to a menu."
+name          = "Taxonomy menu"
+package       = Taxonomy menu
+php           = 5.3
+
+; Tests
+files[] = tests/taxonomy_menu.test
+
+; Information added by drupal.org packaging script on 2013-01-25
+version = "7.x-2.0-alpha2"
+core = "7.x"
+project = "taxonomy_menu"
+datestamp = "1359084813"
+

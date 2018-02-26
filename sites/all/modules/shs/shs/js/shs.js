@@ -225,6 +225,7 @@
         // Display triggering element.
         $triggering_element.fadeIn();
         $triggering_element.css('display','inline-block');
+        $triggering_element.trigger('change');
       }
     });
   }

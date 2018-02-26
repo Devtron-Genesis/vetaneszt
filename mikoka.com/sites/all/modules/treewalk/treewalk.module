@@ -1,0 +1,214 @@
+<?php
+
+
+/**
+ * Implements hook_block_info()
+ */
+function treewalk_block_info() {
+  $blocks['treewalk_menu_prev_next'] = array(
+    'info' => t('Treewalk Prev/Next (!what)', array('!what' => t('Menu'))),
+    'cache' => DRUPAL_NO_CACHE,
+  );
+  return $blocks;
+}
+
+
+/**
+ * Implements hook_block_configure()
+ */
+function treewalk_block_configure($delta = '') {
+  $form = array();
+  if ($delta == 'treewalk_menu_prev_next') {
+    $settings = treewalk_load_block_settings();
+    $form['menu_name'] = array(
+      '#type' => 'select',
+      '#title' => t('Menu'),
+      '#default_value' => $settings['menu_name'],
+      '#options' => menu_get_menus(),
+    );
+    foreach (array(
+      'prev_label' => 'Previous label',
+      'next_label' => 'Next label'
+    ) as $key => $title) {
+      $form[$key] = array(
+        '#type' => 'textfield',
+        '#title' => t($title),
+        '#default_value' => $settings[$key],
+      );
+    }
+  }
+  return $form;
+}
+
+
+/**
+ * Implements hook_block_save()
+ */
+function treewalk_block_save($delta = '', $edit = array()) {
+  if ($delta == 'treewalk_menu_prev_next') {
+    variable_set('treewalk_block_settings', $edit);
+  }
+}
+
+
+/**
+ * Implements hook_block_view()
+ */
+function treewalk_block_view($delta = '') {
+  if ($delta == 'treewalk_menu_prev_next') {
+    $settings = treewalk_load_block_settings();
+    if (!empty($settings['menu_name'])) {
+      $factory = new treewalk_SequenceFactory();
+      $menu_name = $settings['menu_name'];
+      $sequence = $factory->pathMenuLink($menu_name);
+      if ($sequence) {
+        $html = '';
+        foreach (array(
+          'prev' => t($settings['prev_label']),
+          'next' => t($settings['next_label']),
+        ) as $direction => $title) {
+          $reverse = ($direction == 'prev');
+          $next = $sequence->next($_GET['q'], $reverse);
+          if (!empty($next)) {
+            $options = array();
+            $options['attributes']['class'][] = 'treewalk-' . $direction;
+            $link_next = l($title, $next, $options);
+            $html .= $link_next;
+          }
+        }
+        if (!empty($html)) {
+          drupal_add_css(drupal_get_path('module', 'treewalk') . '/css/treewalk.css');
+          $html = '<div class="treewalk-prev-next clearfix">' . $html . '</div>';
+          return array('content' => $html);
+        }
+      }
+    }
+  }
+}
+
+
+function treewalk_load_block_settings() {
+  return variable_get('treewalk_block_settings', array()) + array(
+    'prev_label' => 'Previous page',
+    'next_label' => 'Next page',
+    'menu_name' => 'main-menu',
+  );
+}
+
+
+/**
+ * Implements hook_ds_fields_info()
+ */
+function treewalk_ds_fields_info($entity_type) {
+
+  $fields = array();
+
+  $base = array(
+    'properties' => array(
+      'settings' => array(
+        'prev_label' => array(
+          'type' => 'textfield',
+          'description' => t('"Previous" label'),
+        ),
+        'next_label' => array(
+          'type' => 'textfield',
+          'description' => t('"Next" label'),
+        ),
+      ),
+      'default' => array(
+        'prev_label' => 'Previous item',
+        'next_label' => 'Next item',
+      ),
+    ),
+    'field_type' => DS_FIELD_TYPE_FUNCTION,
+    'function' => 'treewalk_ds_prev_next',
+  );
+
+  foreach (field_info_instances($entity_type) as $bundle => $instances) {
+    foreach ($instances as $fieldname => $instance) {
+      $fieldinfo = field_info_field($fieldname);
+      switch ($fieldinfo['type']) {
+        case 'taxonomy_term_reference':
+        case 'entityreference':
+          if (!isset($fields['treewalk__' . $fieldname])) {
+            $fields['treewalk__' . $fieldname] = array(
+              'title' => t('Treewalk Prev/Next (!what)', array('!what' => $instance['label'])),
+              '_treewalk' => array(
+                'fieldname' => $fieldname,
+                'type' => $fieldinfo['type'],
+              ),
+              'ui_limit' => array($bundle . '|*'),
+            ) + $base;
+          }
+          else {
+            $fields['treewalk__' . $fieldname]['ui_limit'][] = $bundle . '|*';
+          }
+      }
+    }
+  }
+
+  if ($entity_type === 'taxonomy_term') {
+    $fields['treewalk_taxonomy_term'] = array(
+      'title' => t('Prev / Next (!fieldname)', array('!fieldname' => t('Taxonomy'))),
+      '_treewalk' => array(
+        'type' => 'taxonomy_term',
+      ),
+      'ui_limit' => array('*|*'),
+    ) + $base;
+  }
+
+  return array($entity_type => $fields);
+}
+
+
+/**
+ * Implements hook_ds_field_settings_form()
+ */
+function treewalk_ds_field_settings_form($field) {
+  return ds_ds_field_settings_form($field);
+}
+
+
+/**
+ * Field handler for treewalk__*
+ */
+function treewalk_ds_prev_next($vars) {
+  $settings = isset($vars['formatter_settings']) ? $vars['formatter_settings'] : array();
+  $settings += array(
+    'prev_label' => 'Previous item',
+    'next_label' => 'Next item',
+  );
+  drupal_add_css(drupal_get_path('module', 'treewalk') . '/css/treewalk.css');
+  $entity = $vars['entity'];
+  $entity_type = $vars['entity_type'];
+  $sequence = treewalk_get_entity_sequence($vars['_treewalk'], $entity_type);
+  $html = '';
+  foreach (array(
+    'prev' => t($settings['prev_label']),
+    'next' => t($settings['next_label']),
+  ) as $direction => $title) {
+    $reverse = ($direction == 'prev');
+    $next = $sequence->next($vars['entity'], $reverse);
+    if ($next) {
+      $uri = entity_uri($entity_type, $next);
+      $options = $uri['options'];
+      $options['attributes']['class'][] = 'treewalk-' . $direction;
+      $link_next = l($title, $uri['path'], $options);
+      $html .= $link_next;
+    }
+  }
+  if ($html) {
+    return '<div class="treewalk-prev-next clearfix">' . $html . '</div>';
+  }
+}
+
+
+function treewalk_get_entity_sequence($treewalk_settings, $entity_type) {
+  $factory = new treewalk_SequenceFactory();
+  switch ($treewalk_settings['type']) {
+    case 'taxonomy_term_reference':
+      return $factory->taxonomyTermReference($treewalk_settings['fieldname'], $entity_type);
+    case 'taxonomy_term':
+      return $factory->taxonomyTerm();
+  }
+}

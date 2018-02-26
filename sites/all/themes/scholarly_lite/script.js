@@ -30,7 +30,7 @@ $('ul.shs-hierarchy').parent('.item-list').each(function(){
     var ptolecture = $(this).html();
     $(this).parents('.content').siblings('header').before(ptolecture);
     $(this).parents('.region.region-content').siblings('h1#page-title').before(ptolecture);
-    $(this).hide();
+    $(this).parents('.field-name-field-path-to-lecture').hide();
 })
 
 // // Add clases to course menu

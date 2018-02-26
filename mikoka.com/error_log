@@ -1,0 +1,2 @@
+[14-Jul-2017 08:02:58 America/New_York] PHP Fatal error:  Allowed memory size of 67108864 bytes exhausted (tried to allocate 267947 bytes) in /home/tambrisko/public_html/mikoka.com/sites/all/modules/module_filter/module_filter.theme.inc on line 161
+[14-Jul-2017 08:06:00 America/New_York] PHP Fatal error:  Allowed memory size of 67108864 bytes exhausted (tried to allocate 262215 bytes) in /home/tambrisko/public_html/mikoka.com/includes/theme.inc on line 2110

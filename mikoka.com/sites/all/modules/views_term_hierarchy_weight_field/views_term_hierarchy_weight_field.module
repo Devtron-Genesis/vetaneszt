@@ -1,0 +1,106 @@
+<?php
+
+/**
+ * Implements hook_views_api().
+ */
+function views_term_hierarchy_weight_field_views_api() {
+  return array('api' => 3);
+}
+
+/**
+ * Implements hook_formid_alter().
+ */
+function views_term_hierarchy_weight_field_form_taxonomy_overview_terms_alter(&$form, $form_state) {
+  $form['#submit'][] = 'views_term_hierarchy_weight_field_submit';
+}
+
+/**
+ * Custom submit handler that saves the hierarchical weight.
+ */
+function views_term_hierarchy_weight_field_submit($form, &$form_state) {
+  $page = isset($_GET['page']) ? $_GET['page'] : 0;
+  $offset = $form['#page_increment'];
+  $currentoffset = $offset * $page;
+  foreach (array_values($form_state['input']) as $hweight => $term) {
+    if (is_array($term)) {
+      $hdepth = count(taxonomy_get_parents_all($term['tid'])) - 1;
+      views_term_hierarchy_weight_field_update($term['tid'], $hweight + $currentoffset, $hdepth);
+    }
+  }
+}
+
+/**
+ * Implements hook_taxonomy_term_insert().
+ */
+function views_term_hierarchy_weight_field_taxonomy_term_insert($term) {
+  foreach (taxonomy_get_tree($term->vid) as $hweight => $term) {
+    $hdepth = count(taxonomy_get_parents_all($term->tid)) - 1;
+    views_term_hierarchy_weight_field_update($term->tid, $hweight, $hdepth);
+  }
+}
+
+/**
+ * Implements hook_cron().
+ */
+function views_term_hierarchy_weight_field_cron() {
+  foreach(array_keys(menu_get_menus()) as $menu) {
+    $menu_tree = menu_tree_all_data($menu);
+    $menu_flatten = array();
+    _views_term_hierarchy_weight_field_flatten_menu($menu_tree, $menu_flatten);
+
+    foreach(array_values($menu_flatten) as $index => $menu_link) {
+      db_update('menu_links')
+        ->fields(array('hweight' => $index))
+        ->condition('mlid', $menu_link['mlid'], '=')
+        ->execute();
+    }
+  }
+}
+
+/**
+ * Implements hook_modules_installed().
+ */
+function views_term_hierarchy_weight_field_modules_installed($modules) {
+  if (in_array('entity_menu_links', $modules)) {
+    $field = 'hweight';
+    $schema = drupal_get_schema('menu_links');
+    if (!db_field_exists('menu_links_revision', $field)) {
+      db_add_field('menu_links_revision', $field, $schema['fields'][$field]);
+    }
+  }
+}
+
+/**
+ * Helper function. Flatten a menu tree into a single flat array keyed by mlid.
+ */
+function _views_term_hierarchy_weight_field_flatten_menu($tree, &$flat) {
+  foreach ($tree as $data) {
+    if (!$data['link']['hidden']) {
+      $flat[$data['link']['mlid']] = $data['link'];
+      if ($data['below']) {
+        _views_term_hierarchy_weight_field_flatten_menu($data['below'], $flat);
+      }
+    }
+  }
+}
+
+/**
+ * API function, set the hierarchical weight of a term.
+ *
+ * @param int $tid
+ *   The Term ID
+ * @param int $hweight
+ *   The term weight
+ * @param int $hdepth
+ *   The term depth
+ */
+function views_term_hierarchy_weight_field_update($tid, $hweight, $hdepth) {
+  if (!is_numeric($tid) || !is_numeric($hweight) || !is_int($hdepth)) {
+    return;
+  }
+
+  db_update('taxonomy_term_data')
+    ->fields(array('hweight' => $hweight, 'hdepth' => $hdepth))
+    ->condition('tid', $tid, '=')
+    ->execute();
+}
