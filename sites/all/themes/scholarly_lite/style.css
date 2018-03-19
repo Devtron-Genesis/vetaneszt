@@ -1249,7 +1249,6 @@ video {
 	list-style: none;
 }
 .view-display-id-block_1 a {
-    font-size: 15px;
     font-weight: bold;
     text-decoration: none;
 }
@@ -1282,4 +1281,7 @@ li.lecture-li ul li div {
 }
 h1#page-title {
 	clear: both;
+}
+#node-28 .field.field-name-field-registration-link-image {
+	margin-top: 15px;
 }

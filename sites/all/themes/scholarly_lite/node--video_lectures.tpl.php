@@ -34,7 +34,7 @@
 
       <?php if ($display_submitted): ?>
           <div class="submitted-user">
-          <?php print t('By !username', array('!username' => $name)); ?>
+          <?php print t('!username', array('!username' => $name)); ?>
           </div>
       <?php endif; ?>
 
