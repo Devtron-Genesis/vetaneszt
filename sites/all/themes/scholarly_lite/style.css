@@ -1282,6 +1282,6 @@ li.lecture-li ul li div {
 h1#page-title {
 	clear: both;
 }
-#node-28 .field.field-name-field-registration-link-image {
+.node-type-article .node-article .field.field-name-field-registration-link-image {
 	margin-top: 15px;
 }
