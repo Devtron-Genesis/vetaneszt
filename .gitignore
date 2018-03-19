@@ -4,9 +4,7 @@ sites/*/settings*.php
 # Ignore paths that contain user-generated content.
 sites/*/files
 sites/*/private
-mihaido.com/
-mihaido.com/*
-mikoka.com/
+mikoka.com
 mikoka.com/*
-.well-known
-
+mihaido.com
+mihaido.com/*

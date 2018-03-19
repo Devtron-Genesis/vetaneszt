@@ -23,18 +23,18 @@ function block_export_import_blocks_export_form($form, &$form_state) {
         $themes[$data->name] = $data->info['name'];
       }
     }
-    // get theme if filtered
-    $theme_name = isset($_SESSION['blcok_export_theme_filter']) ? $_SESSION['blcok_export_theme_filter'] : '';
-    // filter by theme element
+    // Get theme if filtered.
+    $theme_name = isset($_SESSION['block_export_theme_filter']) ? $_SESSION['block_export_theme_filter'] : '';
+    // Filter by theme element.
     $form['theme_name'] = array(
       '#type' => 'select',
       '#title' => t('Available Themes'),
       '#options' => array('' => t('-- Select --')) + (array) $themes,
       '#default_value' => $theme_name,
-      '#description' => t('Use only if you have the same region(s) where you are going to import.')
+      '#description' => t('Use only if you have the same region(s) where you are going to import.'),
     );
 
-    // filter button
+    // Filter button.
     $form['filter_theme'] = array(
       '#type' => 'submit',
       '#value' => t('Filter'),
@@ -42,8 +42,8 @@ function block_export_import_blocks_export_form($form, &$form_state) {
       '#submit' => array('_block_export_import_filter_theme_submit'),
     );
 
-    // reset button
-    if(!empty($theme_name)) {
+    // Reset button.
+    if (!empty($theme_name)) {
       $form['reset_theme'] = array(
         '#type' => 'submit',
         '#value' => t('Reset'),
@@ -52,7 +52,11 @@ function block_export_import_blocks_export_form($form, &$form_state) {
     }
 
     $header = array();
-    $header['info'] = array('data' => t('Block Name'), 'field' => 'bc.info', 'sort' => 'ASC');
+    $header['info'] = array(
+      'data' => t('Block Name'),
+      'field' => 'bc.info',
+      'sort' => 'ASC',
+    );
     if (!empty($theme_name)) {
       $theme_regions = $list_themes[$theme_name]->info['regions'];
       $header['region'] = array('data' => t('Region'), 'field' => 'b.region');
@@ -147,7 +151,7 @@ function block_export_import_blocks_export_form($form, &$form_state) {
  */
 function _block_export_import_filter_theme_validate($form, &$form_state) {
   $theme = $form_state['values']['theme_name'];
-  if(empty($theme)) {
+  if (empty($theme)) {
     form_set_error('theme_name', t('Please select a theme to filter'));
   }
 }
@@ -157,12 +161,12 @@ function _block_export_import_filter_theme_validate($form, &$form_state) {
  */
 function _block_export_import_filter_theme_submit($form, &$form_state) {
   $theme = $form_state['values']['theme_name'];
-  if(!empty($theme)) {
-    $_SESSION['blcok_export_theme_filter'] = $theme;
+  if (!empty($theme)) {
+    $_SESSION['block_export_theme_filter'] = $theme;
   }
   else {
-    if(isset($_SESSION['blcok_export_theme_filter'])) {
-      unset($_SESSION['blcok_export_theme_filter']);
+    if (isset($_SESSION['block_export_theme_filter'])) {
+      unset($_SESSION['block_export_theme_filter']);
     }
   }
 }
@@ -171,7 +175,7 @@ function _block_export_import_filter_theme_submit($form, &$form_state) {
  * Callback to reset filter by theme.
  */
 function _block_export_import_reset_theme_submit($form, &$form_state) {
-  unset($_SESSION['blcok_export_theme_filter']);
+  unset($_SESSION['block_export_theme_filter']);
 }
 
 /**
@@ -219,10 +223,10 @@ function _block_export_import_get_importable_object($form_state) {
         // seleted blocks.
         $query = db_select('block_custom', 'bc');
         $query->fields('bc', array('info', 'body', 'format'));
-        $query->innerJoin('block', 'b', 'b.delta = bc.bid');
-        $query->leftJoin('block_node_type', 'bnt', 'bc.bid = bnt.delta');
+        $query->innerJoin('block', 'b', 'bc.bid = b.bid');
+        $query->leftJoin('block_node_type', 'bnt', 'b.delta = bnt.delta');
         $query->fields('bnt', array('type'));
-        $query->leftJoin('block_role', 'br', 'bc.bid = br.delta');
+        $query->leftJoin('block_role', 'br', 'b.delta = br.delta');
         $query->fields('br', array('rid'));
         $query->fields('b', $block_schema_fields);
         $query->condition('bc.bid', $bid);
@@ -238,9 +242,9 @@ function _block_export_import_get_importable_object($form_state) {
           // Iterate through each database result.
           foreach ($result as $key => $data) {
             // The Block description.
-            $block_obj['data']['info'] = $data->info;
+            $block_obj['data']['info'] = addslashes($data->info);
             // Custom title for the block.
-            $block_obj['data']['title'] = $data->title;
+            $block_obj['data']['title'] = addslashes($data->title);
             // The Block body contents.
             $block_obj['data']['body'] = addslashes($data->body);
             // The filter_format.format of the block body.
@@ -301,7 +305,7 @@ function _block_export_import_get_importable_object($form_state) {
               $export_data .= "  'theme' => '" . $data['theme'] . "', \n";
               $export_data .= "  'region' => '" . $data['region'] . "', \n";
             }
-            //Customize the styling of this block by adding CSS classes
+            // Customize the styling of this block by adding CSS classes.
             if (array_key_exists('css_class', $data)) {
               $export_data .= "  'css_class' => '" . $data['css_class'] . "', \n";
             }
