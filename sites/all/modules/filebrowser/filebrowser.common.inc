@@ -237,8 +237,8 @@ function _filebrowser_node_content_delete($node) {
 /**
  * Load a specific node content.
  *
- * @param $fid content fid
- * @return content record
+ * @param $fid integer content fid
+ * @return array content record
  */
 function _filebrowser_node_content_load($fid) {
   static $contents = array();
@@ -278,12 +278,11 @@ function _filebrowser_load_files(&$node, $fid = NULL, $rebuild = FALSE) {
   if (!$fid && (arg(0) == 'node' && is_numeric(arg(2)))) {
     $fid = arg(2);
   }
-  //debug:  echo 'fid = : ' . $fid . '<br>';exit();
 
   // Select current file record according to fid - you are requesting a specific file or subdir: node/23/47
   if ($fid) {
     $content = _filebrowser_node_content_load($fid);
-    if (!$content) {
+    if (empty($content['path'])) {
       drupal_goto("node/{$node->nid}");
     }
     $relative_path = $content['path'];
@@ -723,7 +722,7 @@ function _filebrowser_thumbnails_generate(& $node, & $file) {
       break;
     }
   }
-  return theme('image', array('path' => $icon, 'alt' => 'alt text'));
+  return theme('image', array('path' => $icon, 'alt' => 'alt text',));
 }
 
 /**

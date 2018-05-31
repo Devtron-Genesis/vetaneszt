@@ -72,6 +72,7 @@ function filebrowser_permission() {
 
 /**
  * Implements hook_form().
+ * @Inheritdoc
  */
 function filebrowser_form(&$node, &$form_state) {
   $type = node_type_get_type($node);
@@ -190,7 +191,7 @@ function filebrowser_form(&$node, &$form_state) {
     '#type' => 'textarea',
     '#title' => t('Accepted files for uploading'),
     '#description' => t('List of file patterns accepted for upload. Empty means anything.'),
-    '#default_value' => isset($node->folder_uploads->accept_uploaded_files) ? $node->folder_uploads->accept_uploaded_files : '',
+    '#default_value' => isset($node->folder_uploads->accepted_uploaded_files) ? $node->folder_uploads->accepted_uploaded_files : '',
   );
 
   /** Folder presentation
@@ -491,7 +492,7 @@ function filebrowser_view($node, $view_mode) {
             '#weight' => 2
         );
       }
-      if ($node->folder_uploads->enabled && user_access(FILEBROWSER_CREATE_FOLDER)) {
+      if ($node->folder_rights->create_folders && user_access(FILEBROWSER_CREATE_FOLDER)) {
         $form = drupal_get_form('filebrowser_form_create_folder', $node);
         $node->content['filebrowser_form_create_folder'] = array(
             '#markup' => drupal_render($form),
@@ -650,7 +651,6 @@ function filebrowser_form_upload_submit($form, &$form_state) {
   $i = 1; // Later we can have multi-upload
   $node = $form_state['values']['node'];
   $target = _filebrowser_build_new_upload_file_name($node, $form_state, $i);
-  //debug ($target, 'just prior to copy()');
   $success = copy($_FILES['files']['tmp_name']["file_$i"], $target);
   if (!$success) {
     drupal_set_message(t("Unable to upload this file, do you have filesystem right to do that ?"), 'error');
